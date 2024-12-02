@@ -1,21 +1,47 @@
+import kotlin.math.abs
+
 fun main() {
+    data class SplitLists(val left: List<Int>, val right: List<Int>)
+    fun listSplit(input: List<String>): SplitLists {
+        val lefts = mutableListOf<Int>()
+        val rights = mutableListOf<Int>()
+        input.forEach {
+            val parts = it.split(" ").filter { it !=  "" }
+            lefts += Integer.parseInt(parts[0])
+            rights += Integer.parseInt(parts[1])
+        }
+        return SplitLists(lefts, rights)
+    }
+
     fun part1(input: List<String>): Int {
-        return input.size
+        val split = listSplit(input)
+        val lefts = split.left.toMutableList()
+        val rights = split.right.toMutableList()
+
+        lefts.sort()
+        rights.sort()
+
+        var sum = 0
+        lefts.forEachIndexed { index, i ->
+            sum += abs(i-rights[index])
+        }
+        return sum
+
+
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val (lefts, rights) = listSplit(input)
+        var score = 0
+        for(l in lefts){
+            score += l*rights.filter{it == l}.size
+        }
+        return score
     }
 
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
+    val sampleInput = readInput("Day01_s")
+    val testInput = readInput("Day01")
+    part1(testInput).println()
 
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    // Read the input from the `src/Day01.txt` file.
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    part2(testInput).println()
 }
