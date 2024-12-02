@@ -10,6 +10,9 @@ If you're stuck with Kotlin-specific questions or anything related to this templ
 - [Kotlin Slack][slack]
 - Template [issue tracker][issues]
 
+## Note by thedjdoorn
+
+Hey thanks for checking out my (bad) code! You wanna run it? Use `./gradlew run -Pday="01"`, replacing the 01 with whatever day you want to run. Gotta provide your own input for it, though. Yeet that into src/Day01.txt, you get the gist.
 
 [^aoc]:
     [Advent of Code][aoc] – An annual event of Christmas-oriented programming challenges started December 2015.
