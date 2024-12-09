@@ -55,7 +55,10 @@ class Grid(input: List<String>){
     }
 
     fun Mark(s:Spot) {
-        grid[s.y][s.x] = "X"
+//      Dirty hack to prevent the marking of invalid positions
+        if (grid[s.y][s.x] !in listOf("", "\r", "\n")){
+            grid[s.y][s.x] = "X"
+        }
     }
 
     fun FindStart(): Spot? {
