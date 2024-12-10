@@ -108,6 +108,22 @@ class Grid(input: List<String>){
         }
         return false
     }
+
+    fun ValueAt(spot: Spot): String {
+        return grid[spot.y][spot.x]
+    }
+
+    fun GetSpotsWith(find: String): List<Spot>{
+        val result = mutableListOf<Spot>()
+        grid.forEachIndexed{yIndex, row ->
+            row.forEachIndexed{xIndex,value ->
+                if (find == value){
+                    result.add(Spot(xIndex, yIndex))
+                }
+            }
+        }
+        return result
+    }
 }
 
 fun main() {
