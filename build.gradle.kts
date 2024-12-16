@@ -21,4 +21,5 @@ application {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("com.google.ortools:ortools-java:9.11.4210")
 }
