@@ -4,9 +4,10 @@ import kotlin.math.abs
 import kotlin.math.round
 
 fun main() {
+
     Loader.loadNativeLibraries()
 
-    fun SolveMilp(aVector: Spot, bVector: Spot, target: Spot): Pair<Int, Int>? {
+    fun SolveMilp(aVector: Spot, bVector: Spot, target: ISpotLike, constrained: Boolean = false): Pair<Number, Number>? {
         /*
         * Having
         * x1: amount of A presses
@@ -21,10 +22,10 @@ fun main() {
         * 0 <= x2 <= 100
         * */
 
-
+        val upperLimit = if (constrained) 100.0 else Double.POSITIVE_INFINITY
         val solver = MPSolver.createSolver("GLOP")
-        val aPresses = solver.makeNumVar(0.0, 100.0, "aPresses")
-        val bPresses = solver.makeNumVar(0.0, 100.0, "bPresses")
+        val aPresses = solver.makeNumVar(0.0, upperLimit, "aPresses")
+        val bPresses = solver.makeNumVar(0.0, upperLimit, "bPresses")
         val c0 = solver.makeConstraint(target.x.toDouble(), target.x.toDouble(), "c0")
         c0.setCoefficient(aPresses, aVector.x.toDouble())
         c0.setCoefficient(bPresses, bVector.x.toDouble())
@@ -40,7 +41,7 @@ fun main() {
             abs(aPresses.solutionValue() - round(aPresses.solutionValue())) < .001 &&
             abs(bPresses.solutionValue() - round(bPresses.solutionValue())) < .001
             ) {
-            Pair(round(aPresses.solutionValue()).toInt(), round(bPresses.solutionValue()).toInt())
+            Pair(round(aPresses.solutionValue()), round(bPresses.solutionValue()))
         } else {
             if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
                 aPresses.solutionValue().println()
@@ -51,9 +52,10 @@ fun main() {
 
     }
 
+    val buttonRegex = """Button ([AB]): X\+(?<x>([0-9])+), Y\+(?<y>([0-9])+)""".toRegex()
+    val targetRegex = """Prize: X=(?<x>([0-9])+), Y=(?<y>([0-9])+)""".toRegex()
+
     fun part1(input: List<String>): Int {
-        val buttonRegex = """Button ([AB]): X\+(?<x>([0-9])+), Y\+(?<y>([0-9])+)""".toRegex()
-        val targetRegex = """Prize: X=(?<x>([0-9])+), Y=(?<y>([0-9])+)""".toRegex()
         var total = 0
         input.chunked(4).forEachIndexed { idx, it ->
             var match = buttonRegex.find(it[0])!!
@@ -64,19 +66,34 @@ fun main() {
             val prize = Spot(match.groups["x"]!!.value.toInt(), match.groups["y"]!!.value.toInt())
             val pair = SolveMilp(buttonA, buttonB, prize)
             if (pair != null) {
-                total += (pair.first*3 + pair.second)
+                total += (pair.first.toInt()*3 + pair.second.toInt())
             } else {
-                "Machine $idx has no resolution".println()
+//                "Machine $idx has no resolution".println()
             }
         }
         return total
     }
-    fun part2(input: String): Int {
-        return 0
+    fun part2(input: List<String>): Long {
+        var total = 0L
+        input.chunked(4).forEachIndexed { idx, it ->
+            var match = buttonRegex.find(it[0])!!
+            val buttonA = Spot(match.groups["x"]!!.value.toInt(), match.groups["y"]!!.value.toInt())
+            match = buttonRegex.find(it[1])!!
+            val buttonB = Spot(match.groups["x"]!!.value.toInt(), match.groups["y"]!!.value.toInt())
+            match = targetRegex.find(it[2])!!
+            val prize = LongSpot(match.groups["x"]!!.value.toInt()+10000000000000, match.groups["y"]!!.value.toInt()+10000000000000)
+            val pair = SolveMilp(buttonA, buttonB, prize, false)
+            if (pair != null) {
+                total += (pair.first.toLong()*3 + pair.second.toLong())
+            } else {
+//                "Machine $idx has no resolution".println()
+            }
+        }
+        return total
     }
 
     val sampleInput = readInput("Day13_s")
     val testInput = readInput("Day13")
-    part1(testInput).println()
-//    part2(testInput).println()
+    part1(sampleInput).println()
+    part2(testInput).println()
 }

@@ -107,7 +107,14 @@ fun Direction.Next(): Direction {
     }
 }
 
-data class Spot(val x: Int, val y: Int){
+interface ISpotLike {
+    val x: Number
+    val y: Number
+}
+
+data class LongSpot(override val x: Long, override val y: Long): ISpotLike
+
+data class Spot(override val x: Int, override val y: Int) : ISpotLike {
     fun GetRelativeSpot(d: Direction): Spot{
         return Spot(x + d.x, y + d.y)
     }
